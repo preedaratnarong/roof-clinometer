@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0f0a"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0f0a"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" href="favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="RoofAngle">
 <title>Roof Clinometer โซล่าเซลล์</title>
 <style>
 :root{--l:#A6FF00;--bg:#07090a;--c:#11161a;--b:#1e262c;--t:#e8f0e0;--m:#8a958c;--a:#ffb020;--r:#ff4d4d}
@@ -28,6 +28,8 @@ input,select{background:#0a0e10;color:#fff;border:1px solid var(--b);border-radi
 .tube{position:relative;height:40px;border-radius:20px;background:#0a0e10;border:2px solid var(--b);margin:10px 0}.tube i{position:absolute;top:5px;width:60px;height:26px;border-radius:13px;left:calc(50% - 30px);background:#ffc040}.tube i.ok{background:var(--l)}.tube:after{content:"";position:absolute;left:calc(50% - 34px);width:68px;top:0;bottom:0;border-left:2px solid #a6ff0088;border-right:2px solid #a6ff0088}
 .hist{font-size:13px}.hist div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b);padding:8px 0;gap:6px}.hist small{color:var(--m)}
 .hold{border-color:var(--a)!important}.hold .big{color:var(--a)}
+#instBtn{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:50;background:#A6FF00;color:#07090a;border:0;border-radius:24px;padding:10px 16px;font-weight:700;font-size:14px;box-shadow:0 4px 18px #A6FF0055;display:none}
+#iosSheet{position:fixed;inset:0;background:#000b;z-index:60;display:none;align-items:flex-end}#iosSheet>div{background:#11161a;border-top:2px solid #A6FF00;border-radius:18px 18px 0 0;padding:20px;width:100%;color:#e8f0e0;font-size:15px;line-height:1.7}#iosSheet b{color:#A6FF00}#iosSheet button{margin-top:12px;width:100%;padding:12px;border:0;border-radius:12px;background:#A6FF00;font-weight:700}
 </style></head><body>
 <header><h1>☀️ Roof Clinometer<small>วัดมุมหลังคา · งานติดตั้งโซล่าเซลล์</small></h1><span id="st" class="lbl">● ยังไม่เริ่ม</span></header>
 <div class="msg" id="msg"></div>
@@ -70,7 +72,7 @@ input,select{background:#0a0e10;color:#fff;border:1px solid var(--b);border-radi
 <div class="hist" id="hl" style="margin-top:8px"></div></div></section>
 
 <nav><button class="on" data-t="clino"><i>📐</i>วัดมุม</button><button data-t="level"><i>🫧</i>ลูกน้ำ</button><button data-t="solar"><i>☀️</i>โซล่า</button><button data-t="hist"><i>📋</i>ประวัติ</button></nav>
-<script>
+<button id="instBtn">📲 ติดตั้งแอป</button><div id="iosSheet"><div><b>ติดตั้งบน iPhone / iPad</b><br>1. เปิดหน้านี้ใน <b>Safari</b><br>2. กดปุ่ม <b>แชร์</b> (สี่เหลี่ยมมีลูกศรชี้ขึ้น ⬆️)<br>3. เลื่อนลงแล้วเลือก <b>“เพิ่มไปยังหน้าจอโฮม”</b><br>4. กด <b>เพิ่ม</b> — ไอคอน RoofAngle จะอยู่บนหน้าจอโฮม<button id="iosClose">เข้าใจแล้ว</button></div></div><script>
 const $=id=>document.getElementById(id),D=180/Math.PI,LS=localStorage;
 let g={x:0,y:0,z:9.81},init=false,hold=false,orient='auto',sound=false,heading=null,lat=13.75,lastBeep=0;
 let off=JSON.parse(LS.getItem('rc_off')||'{"x":0,"y":0}'),hist=JSON.parse(LS.getItem('rc_hist')||'[]'),tgt=parseFloat(LS.getItem('rc_tgt'));
@@ -137,5 +139,12 @@ $('clr').onclick=()=>{if(confirm('ล้างประวัติทั้ง�
 $('csv').onclick=()=>{const rows=[['time','angle_deg','slope_pct','rise_cm_per_m','heading_deg','direction','note'],...hist.map(h=>[h.time,h.ang,h.pct,h.pct,h.head??'',h.head!=null?thdir(h.head):'',h.note])];
  const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='roof_angles.csv';a.click()};
 drawH();solar();if(!window.DeviceMotionEvent&&!window.DeviceOrientationEvent)msg('❌ เบราว์เซอร์นี้ไม่รองรับเซนเซอร์');
-if('serviceWorker'in navigator){}
+if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW',e)))}
+(function(){const sa=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;const b=document.getElementById('instBtn'),sh=document.getElementById('iosSheet');if(sa)return;
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;b.style.display='block'});
+window.addEventListener('appinstalled',()=>{b.style.display='none';dp=null});
+if(ios)b.style.display='block';
+b.onclick=async()=>{if(dp){dp.prompt();const r=await dp.userChoice;if(r.outcome==='accepted')b.style.display='none';dp=null}else if(ios){sh.style.display='flex'}else{location.href='install.html'}};
+document.getElementById('iosClose').onclick=()=>sh.style.display='none';})();
 </script></body></html>
