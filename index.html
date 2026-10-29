@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0f0a"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Roof Clinometer โซล่าเซลล์</title>
+<style>
+:root{--l:#A6FF00;--bg:#07090a;--c:#11161a;--b:#1e262c;--t:#e8f0e0;--m:#8a958c;--a:#ffb020;--r:#ff4d4d}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(circle at 50% 0,#13200a,var(--bg) 60%);color:var(--t);font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;padding:12px 12px 90px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+h1{font-size:18px;color:var(--l);letter-spacing:.5px}h1 small{display:block;color:var(--m);font-size:11px;font-weight:400}
+.card{background:linear-gradient(160deg,#141b1f,#0d1114);border:1px solid var(--b);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 6px 20px #0008}
+.big{font-size:64px;font-weight:800;text-align:center;color:var(--l);text-shadow:0 0 24px #a6ff0055;font-variant-numeric:tabular-nums;line-height:1}
+.big span{font-size:28px}.lbl{color:var(--m);font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cell{background:#0a0e10;border:1px solid var(--b);border-radius:12px;padding:8px;text-align:center}
+.cell b{display:block;font-size:22px;color:#fff;font-variant-numeric:tabular-nums}
+.btn{background:#1a2228;color:var(--t);border:1px solid var(--b);border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600}
+.btn.on,.btn.pri{background:var(--l);color:#000;border-color:var(--l)}.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.row .btn{flex:1}
+#start{width:100%;padding:16px;font-size:20px;border-radius:16px;margin-bottom:10px;box-shadow:0 0 24px #a6ff0055}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#0b0f11ee;border-top:1px solid var(--b);padding:6px 4px calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(8px)}
+nav button{flex:1;background:none;border:0;color:var(--m);font-size:12px;padding:6px}nav button i{display:block;font-style:normal;font-size:20px}nav button.on{color:var(--l)}
+.tab{display:none}.tab.on{display:block}
+.msg{background:#2a1a00;border:1px solid var(--a);color:#ffd27a;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px;display:none}
+input,select{background:#0a0e10;color:#fff;border:1px solid var(--b);border-radius:10px;padding:8px;font-size:16px;width:100%}
+.diff{text-align:center;font-weight:700;font-size:18px;margin-top:6px}.g{color:var(--l)}.y{color:var(--a)}.rd{color:var(--r)}
+.note{color:var(--m);font-size:12px;margin-top:8px;line-height:1.5}
+.lv{position:relative;width:260px;height:260px;margin:6px auto;border-radius:50%;background:radial-gradient(#162008,#0a0e10);border:2px solid var(--b)}
+.lv:before,.lv:after{content:"";position:absolute;left:50%;top:50%;border:1px solid #a6ff0055;border-radius:50%;transform:translate(-50%,-50%)}.lv:before{width:40px;height:40px}.lv:after{width:150px;height:150px;border-style:dashed}
+.bub{position:absolute;width:44px;height:44px;border-radius:50%;left:108px;top:108px;background:radial-gradient(circle at 35% 35%,#fff,#ffe08a 40%,#d88a00);box-shadow:0 0 14px #ffb02088}
+.bub.ok{background:radial-gradient(circle at 35% 35%,#fff,#d6ff7a 40%,#6fae00);box-shadow:0 0 18px var(--l)}
+.tube{position:relative;height:40px;border-radius:20px;background:#0a0e10;border:2px solid var(--b);margin:10px 0}.tube i{position:absolute;top:5px;width:60px;height:26px;border-radius:13px;left:calc(50% - 30px);background:#ffc040}.tube i.ok{background:var(--l)}.tube:after{content:"";position:absolute;left:calc(50% - 34px);width:68px;top:0;bottom:0;border-left:2px solid #a6ff0088;border-right:2px solid #a6ff0088}
+.hist{font-size:13px}.hist div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b);padding:8px 0;gap:6px}.hist small{color:var(--m)}
+.hold{border-color:var(--a)!important}.hold .big{color:var(--a)}
+</style></head><body>
+<header><h1>☀️ Roof Clinometer<small>วัดมุมหลังคา · งานติดตั้งโซล่าเซลล์</small></h1><span id="st" class="lbl">● ยังไม่เริ่ม</span></header>
+<div class="msg" id="msg"></div>
+<button class="btn pri" id="start">▶ เริ่มวัด</button>
+
+<section class="tab on" id="t-clino">
+<div class="card" id="ccard">
+<svg viewBox="0 0 200 110" width="100%" height="150"><path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#1e262c" stroke-width="10"/><path id="arc" d="" fill="none" stroke="#A6FF00" stroke-width="10" stroke-linecap="round"/><line id="needle" x1="100" y1="100" x2="190" y2="100" stroke="#fff" stroke-width="3"/><line id="tline" x1="100" y1="100" x2="190" y2="100" stroke="#ffb020" stroke-width="2" stroke-dasharray="4 3"/><circle cx="100" cy="100" r="5" fill="#A6FF00"/><text x="6" y="108" fill="#8a958c" font-size="8">0°</text><text x="94" y="8" fill="#8a958c" font-size="8">90°</text></svg>
+<div class="big" id="ang">--.-<span>°</span></div><div class="lbl" style="text-align:center">มุมความชัน · Tilt</div>
+<div class="diff" id="diff"></div>
+<div class="grid" style="margin-top:10px"><div class="cell"><span class="lbl">ความชัน %</span><b id="pct">--</b></div><div class="cell"><span class="lbl">ยกต่อ 1 ม. (ซม.)</span><b id="rise">--</b></div><div class="cell"><span class="lbl">Pitch X:12</span><b id="pitch">--</b></div><div class="cell"><span class="lbl">อัตราส่วน 1:N</span><b id="ratio">--</b></div></div>
+</div>
+<div class="card"><div class="lbl">แนวการวาง (ขอบมือถือตามแนวลาด)</div>
+<div class="row"><button class="btn on" data-o="auto">อัตโนมัติ</button><button class="btn" data-o="p">แนวตั้ง</button><button class="btn" data-o="l">แนวนอน</button></div>
+<div class="row"><button class="btn" id="hold">⏸ HOLD</button><button class="btn" id="cal">⊙ ตั้งศูนย์</button><button class="btn" id="rst">↺ รีเซ็ต</button></div>
+<div class="row"><button class="btn pri" id="save">💾 บันทึกค่า</button></div>
+<div class="lbl" style="margin-top:10px">มุมเป้าหมาย (°)</div><div class="row"><input id="tgt" type="number" step="0.5" inputmode="decimal" placeholder="เช่น 15"><button class="btn" id="snd">🔕 เสียง/สั่น</button></div>
+<div class="row" id="chips1"></div>
+<p class="note">วางขอบยาวของมือถือทาบไปตามแนวแปหรือแผ่นหลังคา (จากสันลงชายคา) · กด “ตั้งศูนย์” ขณะวางบนพื้นราบเพื่อชดเชยเคส/เซนเซอร์</p></div>
+</section>
+
+<section class="tab" id="t-level"><div class="card"><div class="lv"><div class="bub" id="bub"></div></div>
+<div class="grid"><div class="cell"><span class="lbl">แกน X (ซ้าย-ขวา)</span><b id="lx">--</b></div><div class="cell"><span class="lbl">แกน Y (บน-ล่าง)</span><b id="ly">--</b></div></div>
+<div class="tube"><i id="tb"></i></div><div class="lbl" style="text-align:center">ลูกน้ำแนวยาว · ได้ระดับเมื่อเป็นสีเขียว (±0.5°)</div>
+<p class="note">วางมือถือราบบนแผ่นหลังคา/รางยึดแผง ใช้ตรวจว่าแนวรางได้ระดับในแนวนอน</p></div></section>
+
+<section class="tab" id="t-solar">
+<div class="card"><div class="lbl">ทิศที่หน้าหลังคาหันไป (Azimuth)</div>
+<svg viewBox="0 0 120 120" width="100%" height="170"><circle cx="60" cy="60" r="54" fill="#0a0e10" stroke="#1e262c" stroke-width="3"/><g font-size="9" fill="#8a958c" text-anchor="middle"><text x="60" y="15">N</text><text x="60" y="112" fill="#A6FF00">S</text><text x="110" y="63">E</text><text x="10" y="63">W</text></g><g id="cneedle"><polygon points="60,14 55,60 65,60" fill="#A6FF00"/><polygon points="60,106 55,60 65,60" fill="#444"/></g><circle cx="60" cy="60" r="4" fill="#fff"/></svg>
+<div class="big" style="font-size:44px" id="az">--°</div><div style="text-align:center;font-size:18px" id="azth">--</div>
+<p class="note">ถือมือถือให้ด้านบนของจอชี้ลงตามความลาดของหลังคา (ทิศที่หน้าหลังคาหันไป) ⚠️ แป/เมทัลชีท/โครงเหล็กรบกวนเข็มทิศ — ถอยห่างโลหะ ~1 ม. แล้วเล็งแนวเดียวกัน และโบกมือถือเป็นเลข 8 เพื่อคาลิเบรต</p></div>
+<div class="card"><div class="grid"><div class="cell"><span class="lbl">มุมที่วัด</span><b id="sang">--</b></div><div class="cell"><span class="lbl">มุมแนะนำ</span><b id="opt">14°</b></div><div class="cell"><span class="lbl">ละติจูด</span><b id="lat">13.75°N</b></div><div class="cell"><span class="lbl">ผลผลิตโดยประมาณ</span><b id="yf">--</b></div></div>
+<div class="row"><button class="btn" id="geo">📍 ใช้ตำแหน่งปัจจุบัน</button></div>
+<div class="lbl" style="margin-top:8px">มุมยอดนิยมงานโซล่า (ตั้งเป็นเป้าหมาย)</div><div class="row" id="chips2"></div>
+<p class="note">มุมแนะนำ ≈ ละติจูด หันทิศใต้ (ไทยโดยทั่วไป ~10–18°) · ควรเอียงอย่างน้อย ~5° เพื่อให้ฝนชะล้างฝุ่นได้เอง (self-cleaning)<br>⚠️ <b>ค่าประมาณเท่านั้น</b> จากแบบจำลองอย่างง่าย (เทียบกับมุม/ทิศที่ดีที่สุด) ไม่ใช่การออกแบบจริง — ใช้ PVGIS หรือ PVWatts สำหรับคำนวณผลผลิตจริง</p></div>
+</section>
+
+<section class="tab" id="t-hist"><div class="card"><div class="lbl">โน้ตสำหรับการบันทึกครั้งถัดไป</div><input id="note" placeholder="เช่น หลังคาด้านทิศใต้">
+<div class="row"><button class="btn pri" id="csv">⬇ ส่งออก CSV</button><button class="btn" id="clr">🗑 ล้างทั้งหมด</button></div>
+<div class="hist" id="hl" style="margin-top:8px"></div></div></section>
+
+<nav><button class="on" data-t="clino"><i>📐</i>วัดมุม</button><button data-t="level"><i>🫧</i>ลูกน้ำ</button><button data-t="solar"><i>☀️</i>โซล่า</button><button data-t="hist"><i>📋</i>ประวัติ</button></nav>
+<script>
+const $=id=>document.getElementById(id),D=180/Math.PI,LS=localStorage;
+let g={x:0,y:0,z:9.81},init=false,hold=false,orient='auto',sound=false,heading=null,lat=13.75,lastBeep=0;
+let off=JSON.parse(LS.getItem('rc_off')||'{"x":0,"y":0}'),hist=JSON.parse(LS.getItem('rc_hist')||'[]'),tgt=parseFloat(LS.getItem('rc_tgt'));
+const A=0.15;let cur={ang:0,ax:0,ay:0};
+function msg(t){$('msg').style.display=t?'block':'none';$('msg').innerHTML=t||''}
+function feed(x,y,z){if(!init){g={x,y,z};init=true}else{g.x+=A*(x-g.x);g.y+=A*(y-g.y);g.z+=A*(z-g.z)}if(!hold)compute();$('st').textContent='● กำลังวัด';$('st').style.color='#A6FF00'}
+function compute(){const n=Math.hypot(g.x,g.y,g.z)||1,x=g.x/n,y=g.y/n,z=g.z/n;
+ // bubble axis tilts
+ const ax=Math.atan2(x,Math.abs(z))*D-off.x,ay=Math.atan2(y,Math.abs(z))*D-off.y;
+ let o=orient;if(o==='auto')o=Math.abs(y)>=Math.abs(x)?'p':'l';
+ const raw=Math.asin(Math.min(1,Math.abs(o==='p'?y:x)))*D;
+ const ang=Math.max(0,Math.abs(raw-(o==='p'?Math.abs(off.y):Math.abs(off.x))));
+ cur={ang,ax,ay,o};render()}
+function fmt(v,d=1){return isFinite(v)?v.toFixed(d):'--'}
+function render(){const a=cur.ang,t=Math.tan(a/D);
+ $('ang').innerHTML=fmt(a)+'<span>°</span>';$('pct').textContent=fmt(t*100)+'%';$('rise').textContent=fmt(t*100);
+ $('pitch').textContent=fmt(t*12)+':12';$('ratio').textContent=t>0.0005?'1:'+fmt(1/t):'∞';$('sang').textContent=fmt(a)+'°';
+ const r=Math.min(90,a)/D;$('needle').setAttribute('x2',100+90*Math.cos(r));$('needle').setAttribute('y2',100-90*Math.sin(r));
+ $('arc').setAttribute('d',`M10 100 A90 90 0 0 1 ${100-90*Math.cos(Math.PI-r)} ${100-90*Math.sin(Math.PI-r)}`);
+ if(isFinite(tgt)){const tr=tgt/D;$('tline').setAttribute('x2',100+95*Math.cos(tr));$('tline').setAttribute('y2',100-95*Math.sin(tr));const d=a-tgt,ad=Math.abs(d);
+  $('diff').className='diff '+(ad<=1?'g':ad<=3?'y':'rd');$('diff').textContent=`เป้า ${tgt}° · ต่าง ${d>0?'+':''}${d.toFixed(1)}° ${ad<=1?'✓ ตรงเป้า':''}`;
+  if(sound&&ad<=1&&Date.now()-lastBeep>1500){lastBeep=Date.now();beep();navigator.vibrate&&navigator.vibrate(80)}}else{$('diff').textContent='';$('tline').setAttribute('x2',100)}
+ // level
+ const cl=v=>Math.max(-1,Math.min(1,v/10));$('bub').style.transform=`translate(${-cl(cur.ax)*105}px,${cl(cur.ay)*105}px)`;
+ const ok=Math.abs(cur.ax)<=.5&&Math.abs(cur.ay)<=.5;$('bub').className='bub'+(ok?' ok':'');
+ $('lx').textContent=fmt(cur.ax)+'°';$('ly').textContent=fmt(cur.ay)+'°';$('tb').style.left=`calc(50% - 30px + ${-cl(cur.ax)*45}%)`;$('tb').className=Math.abs(cur.ax)<=.5?'ok':'';
+ solar()}
+let ac;function beep(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),gn=ac.createGain();o.frequency.value=880;gn.gain.value=.15;o.connect(gn);gn.connect(ac.destination);o.start();o.stop(ac.currentTime+.12)}catch(e){}}
+const TH=['เหนือ','ตะวันออกเฉียงเหนือ','ตะวันออก','ตะวันออกเฉียงใต้','ใต้','ตะวันตกเฉียงใต้','ตะวันตก','ตะวันตกเฉียงเหนือ'];
+function thdir(h){return TH[Math.round(h/45)%8]}
+function yieldF(tilt,az,la){ // simple empirical model, estimate only
+ const opt=la,da=az==null?0:Math.abs(((az-180+540)%360)-180);
+ let f=1-0.0001*Math.pow(tilt-opt,2)*1.2;f-=(1-Math.cos(da/D))*Math.sin(tilt/D)*0.55;return Math.max(0.3,Math.min(1,f))}
+function solar(){$('opt').textContent=Math.round(lat)+'°';$('lat').textContent=lat.toFixed(2)+'°'+(lat>=0?'N':'S');
+ if(heading!=null){$('az').textContent=Math.round(heading)+'°';$('azth').textContent='ทิศ'+thdir(heading);$('cneedle').setAttribute('transform',`rotate(${heading} 60 60)`)}
+ $('yf').textContent='≈'+Math.round(yieldF(cur.ang,heading,Math.abs(lat))*100)+'%'}
+function onMotion(e){const a=e.accelerationIncludingGravity;if(a&&a.x!=null){motionOK=true;feed(-a.x,-a.y,-a.z)}}
+let motionOK=false;
+function onOri(e){if(e.webkitCompassHeading!=null)heading=e.webkitCompassHeading;else if(e.absolute&&e.alpha!=null)heading=(360-e.alpha)%360;
+ if(!motionOK&&e.beta!=null){const b=e.beta/D,gm=e.gamma/D;feed(Math.cos(b)*Math.sin(gm)*-9.81*-1,Math.sin(b)*9.81,Math.cos(b)*Math.cos(gm)*9.81)}else solar()}
+async function start(){msg('');if(!window.isSecureContext)msg('⚠️ หน้านี้ไม่ได้เปิดผ่าน HTTPS — มือถือจะไม่ส่งค่าเซนเซอร์ กรุณาเปิดผ่านลิงก์ https://');
+ try{if(window.DeviceMotionEvent&&DeviceMotionEvent.requestPermission){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')return msg('❌ ไม่ได้รับอนุญาตใช้เซนเซอร์การเคลื่อนไหว — ไปที่ Settings > Safari เพื่ออนุญาต แล้วรีเฟรช')}
+  if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){msg('❌ ขออนุญาตเซนเซอร์ไม่สำเร็จ: '+e.message)}
+ addEventListener('devicemotion',onMotion);addEventListener('deviceorientationabsolute',onOri);addEventListener('deviceorientation',onOri);
+ $('start').textContent='✓ กำลังวัด';$('start').classList.remove('pri');wake();
+ setTimeout(()=>{if(!init)msg('❌ ไม่พบข้อมูลเซนเซอร์ — อุปกรณ์นี้อาจไม่มี accelerometer หรือเบราว์เซอร์บล็อก (ต้องเป็น HTTPS)')},2500)}
+let wl;async function wake(){try{wl=await navigator.wakeLock.request('screen')}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(wl&&document.visibilityState==='visible')wake()});
+$('start').onclick=start;
+document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{orient=b.dataset.o;document.querySelectorAll('[data-o]').forEach(x=>x.classList.toggle('on',x===b));compute()});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+b.dataset.t))});
+$('hold').onclick=()=>{hold=!hold;$('hold').classList.toggle('on',hold);$('hold').textContent=hold?'▶ ปล่อย':'⏸ HOLD';$('ccard').classList.toggle('hold',hold)};
+$('cal').onclick=()=>{const n=Math.hypot(g.x,g.y,g.z)||1;off={x:Math.atan2(g.x/n,Math.abs(g.z/n))*D,y:Math.atan2(g.y/n,Math.abs(g.z/n))*D};LS.setItem('rc_off',JSON.stringify(off));compute();msg('✓ ตั้งศูนย์แล้ว (วางบนพื้นราบขณะกด)');setTimeout(()=>msg(''),2000)};
+$('rst').onclick=()=>{off={x:0,y:0};LS.removeItem('rc_off');compute()};
+$('snd').onclick=()=>{sound=!sound;$('snd').textContent=sound?'🔔 เสียง/สั่น':'🔕 เสียง/สั่น';$('snd').classList.toggle('on',sound);if(sound)beep()};
+function setT(v){tgt=v;$('tgt').value=isFinite(v)?v:'';LS.setItem('rc_tgt',v);render()}
+$('tgt').oninput=e=>setT(parseFloat(e.target.value));if(isFinite(tgt))$('tgt').value=tgt;
+['chips1','chips2'].forEach(c=>[5,10,13,15,20].forEach(v=>{const b=document.createElement('button');b.className='btn';b.textContent=v+'°';b.onclick=()=>setT(v);$(c).appendChild(b)}));
+$('geo').onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>{lat=p.coords.latitude;solar()},e=>msg('❌ ระบุตำแหน่งไม่ได้: '+e.message)):msg('ไม่รองรับ GPS');
+function saveH(){LS.setItem('rc_hist',JSON.stringify(hist));drawH()}
+function drawH(){$('hl').innerHTML=hist.length?hist.map((h,i)=>`<div><span><b>${h.ang}°</b> · ${h.pct}% · ${h.head!=null?h.head+'° '+thdir(h.head):'-'}<br><small>${h.time}${h.note?' · '+h.note.replace(/</g,'&lt;'):''}</small></span><button class="btn" onclick="hist.splice(${i},1);saveH()">✕</button></div>`).join(''):'<small>ยังไม่มีบันทึก</small>'}
+$('save').onclick=()=>{const t=Math.tan(cur.ang/D);hist.unshift({ang:+cur.ang.toFixed(1),pct:+(t*100).toFixed(1),head:heading!=null?Math.round(heading):null,time:new Date().toLocaleString('th-TH'),note:$('note').value});saveH();msg('✓ บันทึกแล้ว ดูที่แท็บ “ประวัติ”');setTimeout(()=>msg(''),1500)};
+$('clr').onclick=()=>{if(confirm('ล้างประวัติทั้งหมด?')){hist=[];saveH()}};
+$('csv').onclick=()=>{const rows=[['time','angle_deg','slope_pct','rise_cm_per_m','heading_deg','direction','note'],...hist.map(h=>[h.time,h.ang,h.pct,h.pct,h.head??'',h.head!=null?thdir(h.head):'',h.note])];
+ const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='roof_angles.csv';a.click()};
+drawH();solar();if(!window.DeviceMotionEvent&&!window.DeviceOrientationEvent)msg('❌ เบราว์เซอร์นี้ไม่รองรับเซนเซอร์');
+if('serviceWorker'in navigator){}
+</script></body></html>
